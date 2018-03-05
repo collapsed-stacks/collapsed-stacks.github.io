@@ -207,7 +207,7 @@ def dump_markdown_from_json_lines():
             else:
                 f.write('## No Answers\n\nThere were no answers to this question.\n')
 
-            f.write("\n\n---\nAll content used under the terms of [Stack Exchange's CC BY-SA 3.0 license](../../data/license.txt).\n")
+            f.write("\n\n---\n\nAll content is licensed under the [CC BY-SA 3.0 license](https://creativecommons.org/licenses/by-sa/3.0/).\n")
 
     logger.debug(f"  generating questions index page")
 
@@ -218,6 +218,7 @@ def dump_markdown_from_json_lines():
 
 
 def hacky_suggestion():
+    print()
     print("If you'd now like to create a deterministic git repo of this")
     print("directory, consider running the following in Bash:")
     print("")
@@ -231,6 +232,7 @@ def hacky_suggestion():
     print("  git commit \\")
     print("  --allow-empty-message -m '' \\")
     print("  --allow-empty;")
+    print()
 
 
 if __name__ == '__main__':
