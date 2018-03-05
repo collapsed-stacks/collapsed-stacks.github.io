@@ -102,7 +102,15 @@ def dump_markdown_from_json_lines():
             }
 
     AllUsers = load_table_from_json_lines('Users')
-    PostsWithDeleted = load_table_from_json_lines('PostsWithDeleted')
+    try:
+        Posts = load_table_from_json_lines('Posts')
+    except:
+        PostsWithDeleted = load_table_from_json_lines('PostsWithDeleted')
+        Posts = {
+            post.Id: post
+            for post in PostsWithDeleted.values()
+            if not hasattr(post, 'DeletionDate')
+        }
     Comments = load_table_from_json_lines('Comments')
 
     logger.debug(f"  enriching data structures")
@@ -113,12 +121,6 @@ def dump_markdown_from_json_lines():
 
     Users = {-1: AllUsers[-1]}
     COMMUNITY = Users[-1]
-
-    Posts = {
-        post.Id: post
-        for post in PostsWithDeleted.values()
-        if not hasattr(post, 'DeletionDate')
-    }
 
     Questions = {
         p.Id: p for p in Posts.values() if p.PostTypeId == PostTypeId.QUESTION}
