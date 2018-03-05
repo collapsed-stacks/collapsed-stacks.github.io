@@ -213,7 +213,7 @@ def dump_markdown_from_json_lines():
 
     with open(f'questions/index.md', 'wt', encoding='utf-8') as f:
         f.write("## All Questions\n\n")
-        for question in sorted(Questions.values(), key=lambda q: q.Id):
+        for question in sorted(Questions.values(), key=lambda q: (-q.Score, q.Id)):
             f.write(f" - [{question.Title}](../{question.Path})\n")
 
 
