@@ -8,7 +8,7 @@ from enum import IntEnum
 from glob import glob
 from json import dumps, loads
 from logging import DEBUG, basicConfig as basic_logging_config, getLogger as get_logger
-from os import chdir, makedirs, remove
+from os import makedirs, remove
 from os.path import abspath, dirname
 from re import sub
 from shutil import rmtree
@@ -60,28 +60,31 @@ def copy_xml_dump_to_json_lines():
         logger.debug(f"  from {xml_filename}")
         logger.debug(f"  to {json_filename}")
 
-        with open(xml_filename, 'rb') as xml_file, open(json_filename, 'wt') as json_file:
-            first_tag = None
-            for (_, row) in ElementTree.iterparse(xml_file):
-                if first_tag is None:
-                    first_tag = row.tag
-                elif row.tag != first_tag:
-                    break
+        try:
+            with open(xml_filename, 'rb') as xml_file, open(json_filename, 'wt') as json_file:
+                first_tag = None
+                for (_, row) in ElementTree.iterparse(xml_file):
+                    if first_tag is None:
+                        first_tag = row.tag
+                    elif row.tag != first_tag:
+                        break
 
-                data = {
-                    k: int(v) if any(k.endswith(s) for s in integer_field_suffixes) else v
-                    for (k, v) in row.attrib.items()
-                }
+                    data = {
+                        k: int(v or 0) if any(k.endswith(s) for s in integer_field_suffixes) else v
+                        for (k, v) in row.attrib.items()
+                    }
 
-                if 'Tags' in data:
-                    data['Tags'] = data['Tags'].strip('><').split('><')
+                    if 'Tags' in data:
+                        data['Tags'] = data['Tags'].strip('><').split('><')
 
-                json_line = dumps(data)
+                    json_line = dumps(data)
 
-                assert '\n' not in json_line
+                    assert '\n' not in json_line
 
-                json_file.write(json_line)
-                json_file.write('\n')
+                    json_file.write(json_line)
+                    json_file.write('\n')
+        except ElementTree.ParseError as e:
+            logger.error(e)
 
 
 def dump_markdown_from_json_lines():
@@ -144,7 +147,9 @@ def dump_markdown_from_json_lines():
         question.Path = f'questions/{question.Id}/{question.Slug}'
 
         if hasattr(question, 'AcceptedAnswerId'):
-            question.AcceptedAnswer = Answers[question.AcceptedAnswerId]
+            question.AcceptedAnswer = Answers.get(question.AcceptedAnswerId)
+            if not question.AcceptedAnswer:
+                logger.error(f"Failed to find accepted answer with ID {question.AcceptedAnswerId}.")
         else:
             question.AcceptedAnswer = None
 
@@ -161,7 +166,10 @@ def dump_markdown_from_json_lines():
 
     for user in Users.values():
         user.Slug = sub('[^a-z0-9]+', '-', user.DisplayName[:80].lower()).strip('-') or f'user{user.Id}'
-        user.Url = f'https://stackexchange.com/users/{user.AccountId}/{user.Slug}'
+        if hasattr(user, 'AccountId'):
+            user.Url = f'https://stackexchange.com/users/{user.AccountId}/{user.Slug}'
+        else:
+            user.Url = f'https://stackexchange.com/users/-1/{user.Id}-{user.Slug}'
 
     logger.debug(f"  generating markdown for question pages")
 
