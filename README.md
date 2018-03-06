@@ -1,5 +1,7 @@
 - [Answers on Startups (2009-2013)](https://collapsed-stacks.github.io/onstartups/)
 - [Atheism (2011)](https://collapsed-stacks.github.io/atheism/)
 - [How Things Work (2011)](https://collapsed-stacks.github.io/htw/)
+- [Sexuality (2012)](https://collapsed-stacks.github.io/sexuality/)
 - [Firearms (2011-2012)](https://collapsed-stacks.github.io/firearms/)
+- [Sexuality (2015)](https://collapsed-stacks.github.io/sexuality-2015/)
 - [Startups (2014-2017)](https://collapsed-stacks.github.io/startups/)

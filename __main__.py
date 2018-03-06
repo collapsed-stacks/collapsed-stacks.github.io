@@ -140,7 +140,7 @@ def dump_markdown_from_json_lines():
             post.Owner = COMMUNITY
 
         post.Edited = hasattr(post, 'LastEditDate')
-        # post.BodySource = None
+        post.BodySource = post.Body
 
     for question in Questions.values():
         question.Answers = []
@@ -214,9 +214,9 @@ def dump_markdown_from_json_lines():
 - posted by: [{answer.Owner.DisplayName}]({answer.Owner.Url}) on {answer.CreationDate.split('T')[0]}
 - score: {answer.Score}
 
-{question.BodySource if not
-    ('][' in question.BodySource and
-    ' [' in question.BodySource) else answer.Body}
+{answer.BodySource if not
+    ('][' in answer.BodySource and
+    ' [' in answer.BodySource) else answer.Body}
 
 ''')
             else:
