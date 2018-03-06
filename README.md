@@ -4,6 +4,8 @@
   ([git](https://github.com/collapsed-stacks/atheism/))
 - [Answers on Startups (2009-2013)](https://collapsed-stacks.github.io/onstartups/)
   ([git](https://github.com/collapsed-stacks/onstartups/))
+- [Economics (2011-2012)](https://collapsed-stacks.github.io/economics/)
+  ([git](https://github.com/collapsed-stacks/economics/))
 - [Firearms (2011-2012)](https://collapsed-stacks.github.io/firearms/)
   ([git](https://github.com/collapsed-stacks/firearms/))
 - [How Things Work (2011)](https://collapsed-stacks.github.io/htw/)
@@ -17,7 +19,6 @@
 
 ## Not Archived Yet
 
-- <https://area51.stackexchange.com/proposals/1618/economics>
 - <https://area51.stackexchange.com/proposals/5022/3d-graphics>
 - <https://area51.stackexchange.com/proposals/6426/literature>
 - <https://area51.stackexchange.com/proposals/6433/healthcare-it>
