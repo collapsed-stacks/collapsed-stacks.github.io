@@ -1,3 +1,5 @@
 - [Answers on Startups (2009-2013)](https://collapsed-stacks.github.io/onstartups/)
-- [Firearms Stack Exchange (2011-2012)](https://collapsed-stacks.github.io/firearms/)
-- [Startups Stack Exchange (2014-2017)](https://collapsed-stacks.github.io/startups/)
+- [Atheism (2011)](https://collapsed-stacks.github.io/atheism/)
+- [How Things Work (2011)](https://collapsed-stacks.github.io/htw/)
+- [Firearms (2011-2012)](https://collapsed-stacks.github.io/firearms/)
+- [Startups (2014-2017)](https://collapsed-stacks.github.io/startups/)

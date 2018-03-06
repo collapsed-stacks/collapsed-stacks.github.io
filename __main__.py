@@ -92,6 +92,7 @@ def dump_markdown_from_json_lines():
 
     logger.debug(f"  loading jsonl tables")
 
+
     def load_table_from_json_lines(name):
         logger.debug(f"load_table_from_json_lines({repr(name)})")
 
@@ -139,6 +140,7 @@ def dump_markdown_from_json_lines():
             post.Owner = COMMUNITY
 
         post.Edited = hasattr(post, 'LastEditDate')
+        # post.BodySource = None
 
     for question in Questions.values():
         question.Answers = []
@@ -171,6 +173,17 @@ def dump_markdown_from_json_lines():
         else:
             user.Url = f'https://stackexchange.com/users/-1/{user.Id}-{user.Slug}'
 
+    logger.debug(f"  loading post sources from history")
+
+    with open(f'data/main/PostHistory.jsonl') as f:
+        for revision in (
+                SimpleNamespace(**loads(line))
+                for line in f if line.strip()):
+            if revision.PostHistoryTypeId not in (2, 5, 8):
+                continue # doesn't affect post bodies
+            post = Posts[revision.PostId]
+            post.BodySource = revision.Text.replace('\r\n', '\n').replace('\r', '\n')
+
     logger.debug(f"  generating markdown for question pages")
 
     makedirs('questions', exist_ok=True)
@@ -188,7 +201,7 @@ def dump_markdown_from_json_lines():
 - tagged: {", ".join(f"`{tag}`" for tag in question.Tags)}
 - score: {question.Score}
 
-{question.Body}
+{question.BodySource}
 
 ''')
 
@@ -201,7 +214,9 @@ def dump_markdown_from_json_lines():
 - posted by: [{answer.Owner.DisplayName}]({answer.Owner.Url}) on {answer.CreationDate.split('T')[0]}
 - score: {answer.Score}
 
-{answer.Body}
+{question.BodySource if not
+    ('][' in question.BodySource and
+    ' [' in question.BodySource) else answer.Body}
 
 ''')
             else:
