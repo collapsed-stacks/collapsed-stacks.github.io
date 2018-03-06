@@ -6,7 +6,7 @@
 from collections import defaultdict
 from enum import IntEnum
 from glob import glob
-from json import dumps, loads
+from json import dumps, loads, dump, load
 from logging import DEBUG, basicConfig as basic_logging_config, getLogger as get_logger
 from os import makedirs, remove
 from os.path import abspath, dirname
@@ -26,6 +26,7 @@ def main():
 
     clean_everything()
     copy_xml_dump_to_json_lines()
+    update_config_and_readme()
     dump_markdown_from_json_lines()
     hacky_suggestion()
 
@@ -87,14 +88,80 @@ def copy_xml_dump_to_json_lines():
             logger.error(e)
 
 
+def update_config_and_readme():
+    logger.debug(f"update_config_and_readme()")
+
+    with open('_config.yml', 'rt') as f:
+        config = load(f)
+
+    stack_config = config['stack_site']
+    site_name = stack_config['name']
+    site_slug = stack_config['slug']
+    proposal_id = stack_config['proposal_id']
+
+    new_config = {
+        'stack_site': {
+            'name': stack_config['name'],
+            'slug': stack_config['slug'],
+            'proposal_id': stack_config['proposal_id']
+        },
+        'title': f'{stack_config["name"]} Archive',
+        'exclude': ['data']
+    }
+
+    with open('_config.yml', 'wt') as f:
+        dump(new_config, f, sort_keys=True, indent=2)
+
+    first_year = float('infinity')
+    last_year = float('-infinity')
+
+    post_ids = set()
+
+    with open(f'data/main/PostHistory.jsonl') as f:
+        for line in f:
+            if not line: continue
+            row = loads(line)
+            post_ids.add(row['PostId'])
+            year = int(row['CreationDate'][:4])
+            first_year = min(first_year, year)
+            last_year = max(last_year, year)
+
+    post_count = len(post_ids)
+
+    if first_year == last_year:
+        years_short = f'{first_year}'
+        years_long = f'in {first_year}'
+    else:
+        years_short = f'{first_year}-{last_year}'
+        years_long = f'from {first_year} to {last_year}'
+
+    with open(f'README.md', 'wt') as f:
+        f.write(
+            f"This is an archive of the **{site_name}** Q&A site that existed {years_long}. "
+            f"The official proposal and archive of the site [may be found on Stack Exchange Area "
+            f"51](https://area51.stackexchange.com/proposals/{proposal_id}). All content is "
+            f"licensed under the [CC BY-SA 3.0 license](https://creativecommons.org/licenses/by-"
+            f"sa/3.0/).\n\n")
+        f.write(
+            f"This archive includes browsable copies of the {post_count} questions and answers "
+            f"that existed on the site at the time it was shut down. Each page is a simple "
+            f"markdown file, which may be automatically rendered into a HTML template by GitHub "
+            f"Pages. There is [an index page listing all of the site's `questions/`](https://"
+            f"collapsed-stacks.github.io/{site_slug}/questions/), but it's are more suited to "
+            f"consumption by robots than humans.\n\n")
+        f.write(
+            f"The `data/` directory includes a copy of contents of the official data dump from "
+            f"Area 51. We also add [JSON Lines](http://jsonlines.org) versions of every XML file "
+            f"for convenience. You can grab this from [GitHub at collapsed-stacks/{site_slug}]"
+            f"(https://github.com/collapsed-stacks/{site_slug}).\n")
+
 def dump_markdown_from_json_lines():
     logger.debug(f"dump_markdown_from_json_lines()")
 
     logger.debug(f"  loading jsonl tables")
 
-
-    def load_table_from_json_lines(name):
-        logger.debug(f"load_table_from_json_lines({repr(name)})")
+    def load_table(name):
+        logger.debug(f"  load_table({repr(name)})")
 
         with open(f'data/main/{name}.jsonl') as f:
             return {
@@ -105,17 +172,17 @@ def dump_markdown_from_json_lines():
                 )
             }
 
-    AllUsers = load_table_from_json_lines('Users')
+    AllUsers = load_table('Users')
     try:
-        Posts = load_table_from_json_lines('Posts')
+        Posts = load_table('Posts')
     except:
-        PostsWithDeleted = load_table_from_json_lines('PostsWithDeleted')
+        PostsWithDeleted = load_table('PostsWithDeleted')
         Posts = {
             post.Id: post
             for post in PostsWithDeleted.values()
             if not hasattr(post, 'DeletionDate')
         }
-    Comments = load_table_from_json_lines('Comments')
+    Comments = load_table('Comments')
 
     logger.debug(f"  enriching data structures")
 
