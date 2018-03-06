@@ -111,6 +111,7 @@ def update_config_and_readme():
 
     with open('_config.yml', 'wt') as f:
         dump(new_config, f, sort_keys=True, indent=2)
+        f.write('\n')
 
     first_year = float('infinity')
     last_year = float('-infinity')
@@ -140,7 +141,7 @@ def update_config_and_readme():
             f"This is an archive of the **{site_name}** Q&A site that existed {years_long}. "
             f"The official proposal and archive of the site [may be found on Stack Exchange Area "
             f"51](https://area51.stackexchange.com/proposals/{proposal_id}). All content is "
-            f"licensed under the [CC BY-SA 3.0 license](https://creativecommons.org/licenses/by-"
+            f"licensed under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-"
             f"sa/3.0/).\n\n")
         f.write(
             f"This archive includes browsable copies of the {post_count} questions and answers "
@@ -151,7 +152,7 @@ def update_config_and_readme():
             f"consumption by robots than humans.\n\n")
         f.write(
             f"The `data/` directory includes a copy of contents of the official data dump from "
-            f"Area 51. We also add [JSON Lines](http://jsonlines.org) versions of every XML file "
+            f"Area 51. We also add [JSON Lines](http://jsonlines.org/) versions of every XML file "
             f"for convenience. You can grab this from [GitHub at collapsed-stacks/{site_slug}]"
             f"(https://github.com/collapsed-stacks/{site_slug}).\n")
 
@@ -289,7 +290,7 @@ def dump_markdown_from_json_lines():
             else:
                 f.write('## No Answers\n\nThere were no answers to this question.\n')
 
-            f.write("\n\n---\n\nAll content is licensed under the [CC BY-SA 3.0 license](https://creativecommons.org/licenses/by-sa/3.0/).\n")
+            f.write("\n\n---\n\nAll content is licensed under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).\n")
 
     logger.debug(f"  generating questions index page")
 
@@ -301,10 +302,14 @@ def dump_markdown_from_json_lines():
 
 def hacky_suggestion():
     print()
-    print("If you'd now like to create a deterministic git repo of this")
+    print("If you'd now like to (re-)create a deterministic git repo of this ")
     print("directory, consider running the following in Bash:")
     print("")
-    print("  git init && git add . && ")
+    print("  git init;")
+    print("  git checkout --detach;")
+    print("  git branch -D master;")
+    print("  git checkout --orphan master;")
+    print("  git add . && ")
     print("  GIT_COMMITTER_DATE='Thu Jan  1 00:00:00 UTC 1970' \\")
     print("  GIT_COMMITTER_NAME=' ' \\")
     print("  GIT_COMMITTER_EMAIL='\\<\\>' \\")
