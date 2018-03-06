@@ -56,7 +56,7 @@ def copy_xml_dump_to_json_lines():
     ]
 
     for xml_filename in glob('data/**/*.xml'):
-        json_filename = xml_filename[:-len('xml')] + 'jsonl'
+        json_filename = xml_filename[:-len('xml')].lower() + 'jsonl'
 
         logger.debug(f"  from {xml_filename}")
         logger.debug(f"  to {json_filename}")
@@ -118,14 +118,24 @@ def update_config_and_readme():
 
     post_ids = set()
 
-    with open(f'data/main/PostHistory.jsonl') as f:
-        for line in f:
-            if not line: continue
-            row = loads(line)
-            post_ids.add(row['PostId'])
-            year = int(row['CreationDate'][:4])
-            first_year = min(first_year, year)
-            last_year = max(last_year, year)
+    try:
+        with open(f'data/main/posthistory.jsonl') as f:
+            for line in f:
+                if not line: continue
+                row = loads(line)
+                post_ids.add(row['PostId'])
+                year = int(row['CreationDate'][:4])
+                first_year = min(first_year, year)
+                last_year = max(last_year, year)
+    except FileNotFoundError as error:
+        with open(f'data/main/posts.jsonl') as f:
+            for line in f:
+                if not line: continue
+                row = loads(line)
+                post_ids.add(row['Id'])
+                year = int(row['CreationDate'][:4])
+                first_year = min(first_year, year)
+                last_year = max(last_year, year)
 
     post_count = len(post_ids)
 
@@ -173,17 +183,17 @@ def dump_markdown_from_json_lines():
                 )
             }
 
-    AllUsers = load_table('Users')
+    AllUsers = load_table('users')
     try:
-        Posts = load_table('Posts')
+        Posts = load_table('posts')
     except:
-        PostsWithDeleted = load_table('PostsWithDeleted')
+        PostsWithDeleted = load_table('postswithdelete')
         Posts = {
             post.Id: post
             for post in PostsWithDeleted.values()
             if not hasattr(post, 'DeletionDate')
         }
-    Comments = load_table('Comments')
+    Comments = load_table('comments')
 
     logger.debug(f"  enriching data structures")
 
@@ -243,14 +253,16 @@ def dump_markdown_from_json_lines():
 
     logger.debug(f"  loading post sources from history")
 
-    with open(f'data/main/PostHistory.jsonl') as f:
-        for revision in (
-                SimpleNamespace(**loads(line))
-                for line in f if line.strip()):
-            if revision.PostHistoryTypeId not in (2, 5, 8):
-                continue # doesn't affect post bodies
-            post = Posts[revision.PostId]
-            post.BodySource = revision.Text.replace('\r\n', '\n').replace('\r', '\n')
+    try:
+        with open(f'data/main/posthistory.jsonl') as f:
+            for row in (loads(line) for line in f if line.strip()):
+                if row['PostHistoryTypeId'] not in (2, 5, 8):
+                    continue # doesn't affect post bodies
+                post = Posts[row['PostId']]
+                post.BodySource = row['Text'].replace('\r\n', '\n').replace('\r', '\n')
+    except FileNotFoundError as error:
+        logger.error(error)
+
 
     logger.debug(f"  generating markdown for question pages")
 

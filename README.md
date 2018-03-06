@@ -1,3 +1,5 @@
+- [AskAboutGadgets (2010)](https://collapsed-stacks.github.io/gadgets/)
+  ([git](https://github.com/collapsed-stacks/gadgets/))
 - [Atheism (2011)](https://collapsed-stacks.github.io/atheism/)
   ([git](https://github.com/collapsed-stacks/atheism/))
 - [Answers on Startups (2009-2013)](https://collapsed-stacks.github.io/onstartups/)
@@ -15,7 +17,6 @@
 
 ## Not Archived Yet
 
-- <https://area51.stackexchange.com/proposals/614/electronic-gadgets>
 - <https://area51.stackexchange.com/proposals/1618/economics>
 - <https://area51.stackexchange.com/proposals/5022/3d-graphics>
 - <https://area51.stackexchange.com/proposals/6426/literature>
